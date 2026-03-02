@@ -6,42 +6,42 @@ API_KEY = "AIzaSyAxrlrmER5psHMfNGktfZISB3My81eN2ec"
 genai.configure(api_key=API_KEY)
 
 # Sayfa Ayarları
-st.set_page_config(page_title="Kağan'ın AI Analiz (v3.0)", page_icon="⚽", layout="centered")
+st.set_page_config(page_title="Kağan'ın AI Analiz", page_icon="⚽", layout="centered")
 
 # Tasarım Modifikasyonları
 st.markdown("""
     <style>
     .main { background-color: #0e1117; }
-    .stButton>button { width: 100%; border-radius: 20px; background-color: #d32f2f; color: white; font-weight: bold; border: none; }
+    .stButton>button { width: 100%; border-radius: 20px; background-color: #d32f2f; color: white; font-weight: bold; border: none; height: 3em; }
     .stButton>button:hover { background-color: #b71c1c; color: white; }
-    .result-box { padding: 20px; border-radius: 15px; background-color: #1e1e1e; border: 1px solid #d32f2f; color: white; white-space: pre-wrap; font-family: sans-serif; }
+    .result-box { padding: 20px; border-radius: 15px; background-color: #1e1e1e; border: 1px solid #d32f2f; color: white; white-space: pre-wrap; font-family: sans-serif; line-height: 1.6; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("⚽ Kağan'ın AI Futbol Analiz Merkezi v3.0")
-st.write("Gemini 3.0 Flash Motoru ile Profesyonel Maç Analizi")
+st.title("⚽ Kağan'ın AI Futbol Analiz Merkezi")
+st.write("Profesyonel Maç Analiz Motoru")
 
 # --- GİRDİ PANELİ ---
 with st.container():
     league = st.selectbox("Lig Seçin", ["Premier Lig", "La Liga", "Trendyol Süper Lig"])
     match = st.text_input("Maç İsmi Yazın (Örn: Beşiktaş - Rizespor)", "")
-    analyze_btn = st.button("Gemini 3.0 ile Analiz Et 🚀")
+    analyze_btn = st.button("Analizi Başlat 🚀")
 
 st.markdown("---")
 
 # --- ANALİZ MOTORU ---
 if analyze_btn and match:
-    with st.spinner('Gemini 3.0 Verileri İşliyor...'):
+    with st.spinner('AI Verileri İşliyor...'):
         try:
-            # MODEL GÜNCELLEMESİ: gemini-3.0-flash
-            model = genai.GenerativeModel('gemini-3.0-flash')
+            # EN STABİL MODEL: gemini-1.5-flash
+            model = genai.GenerativeModel('gemini-1.5-flash')
             
             prompt = f"""
             Sen dünyanın en iyi futbol analiz yapay zekasısın. {league} ligindeki {match} maçı için teknik analiz yap.
             
             Lütfen tam olarak şu yapıda cevap ver:
             
-            ### 📊 Gemini 3.0 Olasılık Hesapları
+            ### 📊 Olasılık Hesapları
             - MS 1-X-2: (Yüzdeleri belirt)
             - 2.5 Alt/Üst: (Yüzde belirt)
             - KG Var/Yok: (Yüzde belirt)
@@ -59,7 +59,7 @@ if analyze_btn and match:
             response = model.generate_content(prompt)
             
             # Sonucu göster
-            st.markdown(f"### 🏟️ {match} Raporu")
+            st.subheader(f"🏟️ {match} Raporu")
             st.markdown(f'<div class="result-box">{response.text}</div>', unsafe_allow_html=True)
             
         except Exception as e:
@@ -67,4 +67,4 @@ if analyze_btn and match:
 else:
     st.info("Bir maç ismi girin ve analizi başlatın.")
 
-st.caption("Kağan'ın Özel AI Analiz Sistemi - Gemini 3.0 Edition")
+st.caption("Kağan'ın Özel AI Analiz Sistemi")
