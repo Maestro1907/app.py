@@ -12,10 +12,10 @@ st.set_page_config(page_title="Kağan'ın AI Analiz", page_icon="⚽", layout="c
 st.markdown("""
     <style>
     .main { background-color: #0e1117; }
-    .stButton>button { width: 100%; border-radius: 20px; background-color: #2e7d32; color: white; }
-    .result-box { padding: 20px; border-radius: 15px; background-color: #1e1e1e; border: 1px solid #4caf50; }
+    .stButton>button { width: 100%; border-radius: 20px; background-color: #2e7d32; color: white; font-weight: bold; }
+    .result-box { padding: 20px; border-radius: 15px; background-color: #1e1e1e; border: 1px solid #4caf50; color: white; }
     </style>
-    """, unsafe_allow_stdio=True)
+    """, unsafe_allow_html=True)
 
 st.title("⚽ Kağan'ın AI Futbol Analiz Merkezi")
 st.write("Premier Lig, La Liga ve Süper Lig için gelişmiş olasılık hesaplama.")
@@ -58,7 +58,7 @@ if analyze_btn and match:
             
             # Sonucu göster
             st.markdown(f"### 🏟️ {match} Analiz Raporu")
-            st.markdown(f'<div class="result-box">{response.text}</div>', unsafe_allow_stdio=True)
+            st.markdown(f'<div class="result-box">{response.text}</div>', unsafe_allow_html=True)
             
         except Exception as e:
             st.error(f"Bir hata oluştu: {e}")
