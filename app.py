@@ -8,7 +8,7 @@ genai.configure(api_key=API_KEY)
 # Sayfa Ayarları
 st.set_page_config(page_title="Kağan'ın AI Analiz", page_icon="⚽", layout="centered")
 
-# Tasarım Modifikasyonları (Koyu Tema ve Renkler)
+# Tasarım Modifikasyonları
 st.markdown("""
     <style>
     .main { background-color: #0e1117; }
@@ -23,7 +23,7 @@ st.write("Premier Lig, La Liga ve Süper Lig için gelişmiş olasılık hesapla
 # --- GİRDİ PANELİ ---
 with st.container():
     league = st.selectbox("Lig Seçin", ["Premier Lig", "La Liga", "Trendyol Süper Lig"])
-    match = st.text_input("Maç İsmi Yazın (Örn: Real Madrid - Getafe)", "")
+    match = st.text_input("Maç İsmi Yazın (Örn: Beşiktaş - Rizespor)", "")
     analyze_btn = st.button("Analizi Başlat 🚀")
 
 st.markdown("---")
@@ -32,7 +32,8 @@ st.markdown("---")
 if analyze_btn and match:
     with st.spinner('AI Oyuncu Verilerini ve Sakatlıkları İnceliyor...'):
         try:
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            # MODEL İSMİ BURADA GÜNCELLENDİ (404 Hatasını Çözer)
+            model = genai.GenerativeModel('gemini-1.5-flash-latest')
             
             prompt = f"""
             Sen profesyonel bir futbol analiz uygulamasısın. {league} ligindeki {match} maçı için teknik analiz yap.
