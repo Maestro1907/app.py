@@ -2,7 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 
 # --- YAPILANDIRMA ---
-API_KEY = "AIzaSyAxrlrmER5psHMfNGktfZISB3My81eN2ec"
+API_KEY = "AIzaSyDqfFiaeyQfRu57n1ES4pd1nAxi5Kvnl5E"
 genai.configure(api_key=API_KEY)
 
 # Sayfa Ayarları
