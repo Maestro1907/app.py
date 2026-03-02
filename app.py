@@ -1,70 +1,73 @@
 import streamlit as st
 import google.generativeai as genai
+from datetime import datetime  # <-- Tarihi otomatik çekmek için ekledik
 
 # --- YAPILANDIRMA ---
-API_KEY = "AIzaSyCOAkFPIQq4v4Scz4I0WyO21CisGlxM2Zg"
+API_KEY = "AIzaSyCOAkFPIQq4v4Scz4I0WyO21CisGlxM2Zg" 
 genai.configure(api_key=API_KEY)
 
 # Sayfa Ayarları
 st.set_page_config(page_title="Kağan'ın AI Analiz", page_icon="⚽", layout="centered")
 
-# Tasarım Modifikasyonları
+# O anki tarihi sistemden çekiyoruz (Örn: 2026-03-02)
+sistem_tarihi = datetime.now().strftime("%d %B %Y")
+
+# Tasarım Modifikasyonları (CSS)
 st.markdown("""
     <style>
     .main { background-color: #0e1117; }
-    .stButton>button { width: 100%; border-radius: 20px; background-color: #2e7d32; color: white; font-weight: bold; }
-    .result-box { padding: 20px; border-radius: 15px; background-color: #1e1e1e; border: 1px solid #4caf50; color: white; white-space: pre-wrap; }
+    .stButton>button { width: 100%; border-radius: 20px; background-color: #2e7d32; color: white; font-weight: bold; height: 50px; }
+    .result-box { padding: 20px; border-radius: 15px; background-color: #1e1e1e; border: 1px solid #4caf50; color: white; white-space: pre-wrap; font-family: sans-serif; }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("⚽ Kağan'ın AI Futbol Analiz Merkezi")
-st.write("Premier Lig, La Liga ve Süper Lig için gelişmiş olasılık hesaplama.")
+st.info(f"📅 Sistem Tarihi: {sistem_tarihi} - Analizler bu tarihe göre güncellenir.")
 
 # --- GİRDİ PANELİ ---
 with st.container():
-    league = st.selectbox("Lig Seçin", ["Premier Lig", "La Liga", "Trendyol Süper Lig"])
-    match = st.text_input("Maç İsmi Yazın (Örn: Beşiktaş - Rizespor)", "")
+    league = st.selectbox("Lig Seçin", ["Premier Lig", "La Liga", "Trendyol Süper Lig", "Şampiyonlar Ligi", "Bundesliga"])
+    match = st.text_input("Maç İsmi Yazın", "")
     analyze_btn = st.button("Analizi Başlat 🚀")
 
 st.markdown("---")
 
 # --- ANALİZ MOTORU ---
 if analyze_btn and match:
-    with st.spinner('AI En Güncel Verileri (Gemini 2.5) Kullanarak Analiz Ediyor...'):
+    with st.spinner(f'{match} için internet verileri taranıyor...'):
         try:
-            # 2026 GÜNCEL MODEL İSMİ: gemini-2.5-flash
-            model = genai.GenerativeModel('gemini-2.5-flash')
+            # İnternet erişimi yetkisi verilmiş model
+            model = genai.GenerativeModel(
+                model_name='models/gemini-1.5-flash',
+                tools=[{"google_search_retrieval": {}}]
+            )
             
+            # PROMPT: Tarihi sistemden otomatik alıyoruz
             prompt = f"""
-            Sen profesyonel bir futbol analiz uygulamasısın. {league} ligindeki {match} maçı için teknik analiz yap.
+            Sen profesyonel bir futbol analistisin. 
+            Bugünün gerçek tarihi: {sistem_tarihi}.
             
-            Lütfen tam olarak şu yapıda cevap ver:
+            Lütfen {league} ligindeki {match} maçı için internetten en güncel (bugüne ait) haberleri, 
+            sakatlıkları, cezalıları ve teknik direktör bilgilerini tara. 
             
-            ### 📊 Olasılık Hesaplamaları
-            - MS 1-X-2: (Yüzdeleri belirt)
-            - 2.5 Alt/Üst: (Yüzde belirt)
-            - KG Var/Yok: (Yüzde belirt)
+            Lütfen şu yapıda cevap ver:
+            ### 📊 Olasılık Hesaplamaları ({sistem_tarihi})
+            - MS 1-X-2: (İnternet verilerine dayalı yüzdeler)
+            - 2.5 Alt/Üst & KG: (Tahminler)
             
-            ### 🚑 Oyuncu Bazlı Etki & Sakatlıklar
-            (Maçtaki kritik eksikleri ve bunların takımların gücünü nasıl etkilediğini açıkla.)
+            ### 🚑 Güncel Kadro & Teknik Detaylar
+            (Takımların başındaki mevcut teknik direktörü belirt. Eksik oyuncuların etkisini açıkla.)
             
-            ### ⚠️ Risk Uyarısı
-            (Maçın en sürpriz açık yanını veya bahis riskini belirt.)
-            
-            ### 🎯 Tek Net Tahmin
-            (Kısa ve net tek bir sonuç önerisi.)
+            ### 🎯 Kağan'ın Net Tahmini
+            (Kısa ve net bir sonuç önerisi.)
             """
             
             response = model.generate_content(prompt)
             
-            # Sonucu göster
             st.markdown(f"### 🏟️ {match} Analiz Raporu")
             st.markdown(f'<div class="result-box">{response.text}</div>', unsafe_allow_html=True)
             
         except Exception as e:
-            st.error(f"Bir hata oluştu: {e}")
-            st.info("İpucu: Eğer model ismi hatası devam ederse, API anahtarının Google AI Studio'da aktif olduğundan emin ol.")
+            st.error(f"Hata: {e}")
 else:
-    st.info("Yukarıdaki kutucuğa bir maç ismi yazıp butona basarak analizi görebilirsin.")
-
-st.caption("Kağan'ın Özel AI Analiz Sistemi - 2026")
+    st.info("Maç ismini girip butona basarak anal
