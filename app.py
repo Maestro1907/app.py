@@ -1,53 +1,40 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- YAPILANDIRMA ---
-API_KEY = "AIzaSyDqfFiaeyQfRu57n1ES4pd1nAxi5Kvnl5E"
-genai.configure(api_key=API_KEY)
+# --- KRİTİK AYAR ---
+# Buradaki anahtarı en son aldığın taze anahtarla değiştirdiğinden emin ol!
+API_KEY = "AIzaSyAxrlrmER5psHMfNGktfZISB3My81eN2ec"
 
-# Sayfa Ayarları
-st.set_page_config(page_title="Kağan'ın AI Analiz", page_icon="⚽", layout="centered")
+try:
+    genai.configure(api_key=API_KEY)
+    # En standart ve en stabil model ismini seçiyoruz
+    model = genai.GenerativeModel('gemini-1.5-flash')
+except Exception as e:
+    st.error(f"Kurulum Hatası: {e}")
 
-# Tasarım Modifikasyonları
-st.markdown("""
-    <style>
-    .main { background-color: #0e1117; }
-    .stButton>button { width: 100%; border-radius: 20px; background-color: #d32f2f; color: white; font-weight: bold; border: none; height: 3em; }
-    .result-box { padding: 20px; border-radius: 15px; background-color: #1e1e1e; border: 1px solid #d32f2f; color: white; white-space: pre-wrap; font-family: sans-serif; }
-    </style>
-    """, unsafe_allow_html=True)
+st.set_page_config(page_title="Kağan'ın AI Analiz", page_icon="⚽")
 
-st.title("⚽ Kağan'ın AI Futbol Analiz Merkezi")
+st.title("⚽ Kağan'ın AI Futbol Analizi")
+st.write("Profesyonel Maç Tahmin Motoru")
 
-# --- GİRDİ PANELİ ---
-league = st.selectbox("Lig Seçin", ["Premier Lig", "La Liga", "Trendyol Süper Lig"])
-match = st.text_input("Maç İsmi Yazın", "")
-analyze_btn = st.button("Analizi Başlat 🚀")
-
-st.markdown("---")
+# Giriş Alanı
+match = st.text_input("Maç İsmi (Örn: Beşiktaş - Rizespor)", "")
+analyze_btn = st.button("Analiz Et 🚀")
 
 if analyze_btn and match:
-    with st.spinner('Sistem Uygun Modeli Arıyor ve Analiz Ediyor...'):
-        # Denenecek model isimleri listesi (En yeni nesilden eskiye)
-        model_names = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']
-        success = False
-        
-        for m_name in model_names:
-            try:
-                model = genai.GenerativeModel(m_name)
-                
-                prompt = f"{league} ligindeki {match} maçı için skor tahmini, sakatlık analizi ve % olasılık içeren detaylı bir analiz yap."
-                
-                response = model.generate_content(prompt)
-                
-                st.subheader(f"🏟️ {match} Raporu ({m_name})")
-                st.markdown(f'<div class="result-box">{response.text}</div>', unsafe_allow_html=True)
-                success = True
-                break # Başarılı olursa döngüden çık
-            except Exception:
-                continue # Hata verirse bir sonraki modeli dene
-        
-        if not success:
-            st.error("Maalesef şu an hiçbir AI modeliyle bağlantı kurulamadı. Lütfen API anahtarınızın aktifliğini Google AI Studio'dan kontrol edin.")
+    with st.spinner('Analiz yapılıyor...'):
+        try:
+            # En basit prompt ile testi başlatıyoruz
+            prompt = f"{match} maçı için kısa bir sakatlık analizi ve skor tahmini yap."
+            response = model.generate_content(prompt)
+            
+            st.success("Analiz Tamamlandı!")
+            st.markdown(f"### 🏟️ {match} Raporu")
+            st.write(response.text)
+            
+        except Exception as e:
+            st.error("🚨 HATA DETAYI:")
+            st.code(str(e)) # Hatayı tam olarak ekrana basar ki görelim
+            st.info("Eğer 'API_KEY_INVALID' yazıyorsa anahtar yanlıştır. '404' yazıyorsa model ismi değişmiştir.")
 
-st.caption("Kağan'ın Özel AI Analiz Sistemi")
+st.caption("Kağan'ın Özel AI Sistemi")
