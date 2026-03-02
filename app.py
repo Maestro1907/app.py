@@ -3,17 +3,17 @@ import google.generativeai as genai
 from datetime import datetime
 
 # --- YAPILANDIRMA ---
-# NOT: Buraya Google AI Studio'dan aldığın YENİ anahtarı yapıştır.
+# Buraya Google AI Studio'dan aldığın YENİ anahtarı yapıştır.
 API_KEY = "AIzaSyCOAkFPIQq4v4Scz4I0WyO21CisGlxM2Zg" 
 genai.configure(api_key=API_KEY)
 
 # Sayfa Ayarları
 st.set_page_config(page_title="Kağan'ın AI Analiz", page_icon="⚽", layout="centered")
 
-# O anki tarihi sistemden otomatik çekiyoruz
+# Tarihi sistemden otomatik alıyoruz
 sistem_tarihi = datetime.now().strftime("%d %B %Y")
 
-# Tasarım Modifikasyonları (CSS)
+# Tasarım (CSS)
 st.markdown("""
     <style>
     .main { background-color: #0e1117; }
@@ -37,30 +37,24 @@ st.markdown("---")
 if analyze_btn and match:
     with st.spinner(f'{match} için güncel veriler taranıyor...'):
         try:
-            # İnternet tarama özellikli Gemini 1.5 Flash modeli
+            # 404 Hatasını Engellemek İçin En Kararlı Model Yolu
             model = genai.GenerativeModel(
                 model_name='models/gemini-1.5-flash',
                 tools=[{"google_search_retrieval": {}}]
             )
             
             prompt = f"""
-            Sen profesyonel bir futbol analistisin. 
-            Bugünün gerçek tarihi: {sistem_tarihi}.
-            
-            Lütfen {league} ligindeki {match} maçı için internetten EN GÜNCEL (2026) haberleri, 
-            sakatlıkları, cezalıları ve teknik direktör bilgilerini tara. 
-            
-            Analizinde şunları kesinlikle belirt:
-            1. Takımların başındaki MEVCUT teknik direktör kim? (Eski bilgileri kullanma).
-            2. Sakat veya cezalı kritik oyuncular kimler?
+            Sen profesyonel bir futbol analistisin. Bugünün gerçek tarihi: {sistem_tarihi}.
+            {league} ligindeki {match} maçı için internetten en güncel (2026) verileri tara. 
+            Teknik direktörlerin ve sakat oyuncuların GÜNCEL olduğundan emin ol.
             
             Lütfen şu yapıda cevap ver:
-            ### 📊 Olasılık Hesaplamaları ({sistem_tarihi})
+            ### 📊 Olasılık Hesaplamaları
             - MS 1-X-2: (Yüzde Tahminleri)
             - 2.5 Alt/Üst: (Tahmin)
             
             ### 🚑 Güncel Kadro & Teknik Detaylar
-            (Takımların güncel durumu ve teknik direktör analizi.)
+            (Takımların güncel durumu ve eksik oyuncu analizi.)
             
             ### 🎯 Kağan'ın Net Tahmini
             (Kısa ve net sonuç önerisi.)
@@ -72,7 +66,7 @@ if analyze_btn and match:
             st.markdown(f'<div class="result-box">{response.text}</div>', unsafe_allow_html=True)
             
         except Exception as e:
-            st.error(f"Sistem hatası: {e}")
+            st.error(f"Sistem hatası oluştu: {e}")
 else:
     st.info("Maç ismini girip butona basarak analizi görebilirsin, Kağan.")
 
