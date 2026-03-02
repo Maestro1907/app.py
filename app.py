@@ -13,58 +13,41 @@ st.markdown("""
     <style>
     .main { background-color: #0e1117; }
     .stButton>button { width: 100%; border-radius: 20px; background-color: #d32f2f; color: white; font-weight: bold; border: none; height: 3em; }
-    .stButton>button:hover { background-color: #b71c1c; color: white; }
-    .result-box { padding: 20px; border-radius: 15px; background-color: #1e1e1e; border: 1px solid #d32f2f; color: white; white-space: pre-wrap; font-family: sans-serif; line-height: 1.6; }
+    .result-box { padding: 20px; border-radius: 15px; background-color: #1e1e1e; border: 1px solid #d32f2f; color: white; white-space: pre-wrap; font-family: sans-serif; }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("⚽ Kağan'ın AI Futbol Analiz Merkezi")
-st.write("Profesyonel Maç Analiz Motoru")
 
 # --- GİRDİ PANELİ ---
-with st.container():
-    league = st.selectbox("Lig Seçin", ["Premier Lig", "La Liga", "Trendyol Süper Lig"])
-    match = st.text_input("Maç İsmi Yazın (Örn: Beşiktaş - Rizespor)", "")
-    analyze_btn = st.button("Analizi Başlat 🚀")
+league = st.selectbox("Lig Seçin", ["Premier Lig", "La Liga", "Trendyol Süper Lig"])
+match = st.text_input("Maç İsmi Yazın", "")
+analyze_btn = st.button("Analizi Başlat 🚀")
 
 st.markdown("---")
 
-# --- ANALİZ MOTORU ---
 if analyze_btn and match:
-    with st.spinner('AI Verileri İşliyor...'):
-        try:
-            # EN STABİL MODEL: gemini-1.5-flash
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            
-            prompt = f"""
-            Sen dünyanın en iyi futbol analiz yapay zekasısın. {league} ligindeki {match} maçı için teknik analiz yap.
-            
-            Lütfen tam olarak şu yapıda cevap ver:
-            
-            ### 📊 Olasılık Hesapları
-            - MS 1-X-2: (Yüzdeleri belirt)
-            - 2.5 Alt/Üst: (Yüzde belirt)
-            - KG Var/Yok: (Yüzde belirt)
-            
-            ### 🚑 Kritik Oyuncu ve Sakatlık Analizi
-            (Maçtaki en önemli eksikleri ve bu eksiklerin takımların taktiksel gücünü nasıl etkilediğini detaylıca açıkla.)
-            
-            ### ⚠️ Risk Seviyesi ve Sürpriz Uyarısı
-            (Maçın en tehlikeli yanını belirt.)
-            
-            ### 🎯 Tek Net Tahmin (Master Prediction)
-            (Kısa ve net tek bir sonuç önerisi.)
-            """
-            
-            response = model.generate_content(prompt)
-            
-            # Sonucu göster
-            st.subheader(f"🏟️ {match} Raporu")
-            st.markdown(f'<div class="result-box">{response.text}</div>', unsafe_allow_html=True)
-            
-        except Exception as e:
-            st.error(f"Bir hata oluştu: {e}")
-else:
-    st.info("Bir maç ismi girin ve analizi başlatın.")
+    with st.spinner('Sistem Uygun Modeli Arıyor ve Analiz Ediyor...'):
+        # Denenecek model isimleri listesi (En yeni nesilden eskiye)
+        model_names = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']
+        success = False
+        
+        for m_name in model_names:
+            try:
+                model = genai.GenerativeModel(m_name)
+                
+                prompt = f"{league} ligindeki {match} maçı için skor tahmini, sakatlık analizi ve % olasılık içeren detaylı bir analiz yap."
+                
+                response = model.generate_content(prompt)
+                
+                st.subheader(f"🏟️ {match} Raporu ({m_name})")
+                st.markdown(f'<div class="result-box">{response.text}</div>', unsafe_allow_html=True)
+                success = True
+                break # Başarılı olursa döngüden çık
+            except Exception:
+                continue # Hata verirse bir sonraki modeli dene
+        
+        if not success:
+            st.error("Maalesef şu an hiçbir AI modeliyle bağlantı kurulamadı. Lütfen API anahtarınızın aktifliğini Google AI Studio'dan kontrol edin.")
 
 st.caption("Kağan'ın Özel AI Analiz Sistemi")
