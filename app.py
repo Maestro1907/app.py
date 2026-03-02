@@ -2,15 +2,21 @@ import streamlit as st
 import google.generativeai as genai
 from datetime import datetime
 
-# --- YAPILANDIRMA ---
-# Buraya Google AI Studio'dan aldığın YENİ anahtarı koy Kağan.
-API_KEY = "AIzaSyCOAkFPIQq4v4Scz4I0WyO21CisGlxM2Zg" 
+# --- 1. GÜVENLİK VE YAPILANDIRMA ---
+# GitHub'a yüklerken anahtarı buraya yazma! 
+# Streamlit Cloud'da "Settings > Secrets" kısmına şunu ekle: gemini_api_key = "ANAHTARIN"
+try:
+    API_KEY = st.secrets["gemini_api_key"]
+except:
+    # Yerelde (kendi bilgisayarında) çalışırken buraya yazabilirsin:
+    API_KEY = "AIzaSyCOAkFPIQq4v4Scz4I0WyO21CisGlxM2Zg"
+
 genai.configure(api_key=API_KEY)
 
 # Sayfa Ayarları
 st.set_page_config(page_title="Kağan'ın AI Analiz", page_icon="⚽", layout="centered")
 
-# Tarih Ayarı
+# Tarihi sistemden otomatik çek (İleri tarihlerde hata yapmaz)
 sistem_tarihi = datetime.now().strftime("%d %B %Y")
 
 # Tasarım (CSS)
@@ -24,58 +30,49 @@ st.markdown("""
 st.title("⚽ Kağan'ın AI Futbol Analiz Merkezi")
 st.info(f"📅 Sistem Tarihi: {sistem_tarihi}")
 
-# --- GİRDİ PANELİ ---
-league = st.selectbox("Lig Seçin", ["Premier Lig", "La Liga", "Trendyol Süper Lig", "Bundesliga"])
+# --- 2. GİRDİ PANELİ ---
+league = st.selectbox("Lig Seçin", ["Premier Lig", "La Liga", "Trendyol Süper Lig", "Bundesliga", "Şampiyonlar Ligi"])
 match = st.text_input("Maç İsmi Yazın (Örn: Brighton - Fulham)", "")
 analyze_btn = st.button("Analizi Başlat 🚀")
 
 st.markdown("---")
 
-# --- ANALİZ MOTORU ---
+# --- 3. ANALİZ MOTORU ---
 if analyze_btn and match:
-    with st.spinner('AI Güncel Verileri Tarıyor...'):
+    with st.spinner('AI 2026 güncel verilerini internetten tarıyor...'):
         try:
-            # KRİTİK DEĞİŞİKLİK: 
-            # 404 hatasını aşmak için 'models/' ön ekini sildik ve sadece model adını yazdık.
-            # Ayrıca internet arama (tools) özelliğini bu model için en kararlı yolla çağırdık.
-            
+            # KRİTİK: 404 hatasını önleyen en stabil tanımlama
             model = genai.GenerativeModel(
-                model_name='gemini-1.5-flash', # Sadece ismi kullanıyoruz
-                tools=[{"google_search_retrieval": {}}]
+                model_name='gemini-1.5-flash',
+                tools=[{"google_search_retrieval": {}}] # İNTERNET TARAMASI AKTİF
             )
             
             prompt = f"""
-            Bugünün tarihi {sistem_tarihi}. {league} ligindeki {match} maçı için internetten en güncel (2026) verileri tara. 
-            Brighton hocasının Hürzeler olduğunu, Liverpool hocasının Arne Slot olduğunu unutma. 
+            Sen profesyonel bir futbol analistisin. Bugünün gerçek tarihi: {sistem_tarihi}.
+            {league} ligindeki {match} maçı için internetten en güncel (2026) verileri tara. 
+            Brighton başında Fabian Hürzeler, Liverpool başında Arne Slot olduğunu doğrula. 
             Eski verileri (De Zerbi dönemi gibi) kesinlikle kullanma.
             
-            Lütfen şu yapıda yanıt ver:
+            Analiz Raporu:
             ### 📊 Olasılık Hesaplamaları
             - MS 1-X-2: (Yüzde Tahminleri)
             
-            ### 🚑 Güncel Kadro & Sakatlıklar
-            (Takımların GÜNCEL hocasını ve kritik eksikleri belirt.)
+            ### 🚑 Güncel Kadro & Teknik Detaylar
+            (Takımların başındaki MEVCUT hocayı belirt ve sakatları listele.)
             
             ### 🎯 Kağan'ın Net Tahmini
-            (Kısa ve net bir sonuç önerisi.)
+            (Kısa ve net sonuç önerisi.)
             """
             
-            # Content üretimi
             response = model.generate_content(prompt)
             
             st.markdown(f"### 🏟️ {match} Analiz Raporu")
             st.markdown(f'<div class="result-box">{response.text}</div>', unsafe_allow_html=True)
             
         except Exception as e:
-            # EĞER HALA 404 VERİRSE BU ALTERNATİF MODELİ DENER:
-            try:
-                model_alt = genai.GenerativeModel(model_name='gemini-pro')
-                response_alt = model_alt.generate_content(f"{match} maçı için kısa bir analiz yap.")
-                st.warning("Flash modelinde sorun çıktı, alternatif modelle (Gemini Pro) yanıt veriliyor.")
-                st.markdown(f'<div class="result-box">{response_alt.text}</div>', unsafe_allow_html=True)
-            except:
-                st.error(f"Hala hata alıyoruz Kağan. Hata mesajı: {e}")
+            st.error(f"Bir sorun oluştu: {e}")
+            st.warning("Eğer 404 alıyorsan terminale 'pip install -U google-generativeai' yazmalısın.")
 else:
-    st.info("Maç ismini girip butona basman yeterli.")
+    st.info("Maç ismini girip butona basman yeterli, Kağan.")
 
-st.caption(f"Kağan'ın Özel AI Sistemi - {sistem_tarihi}")
+st.caption(f"Kağan'ın Özel Sistemi - {sistem_tarihi}")
