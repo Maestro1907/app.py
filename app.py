@@ -13,7 +13,7 @@ st.markdown("""
     <style>
     .main { background-color: #0e1117; }
     .stButton>button { width: 100%; border-radius: 20px; background-color: #2e7d32; color: white; font-weight: bold; }
-    .result-box { padding: 20px; border-radius: 15px; background-color: #1e1e1e; border: 1px solid #4caf50; color: white; }
+    .result-box { padding: 20px; border-radius: 15px; background-color: #1e1e1e; border: 1px solid #4caf50; color: white; white-space: pre-wrap; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -30,10 +30,10 @@ st.markdown("---")
 
 # --- ANALİZ MOTORU ---
 if analyze_btn and match:
-    with st.spinner('AI Oyuncu Verilerini ve Sakatlıkları İnceliyor...'):
+    with st.spinner('AI En Güncel Verileri (Gemini 2.5) Kullanarak Analiz Ediyor...'):
         try:
-            # MODEL İSMİ BURADA GÜNCELLENDİ (404 Hatasını Çözer)
-            model = genai.GenerativeModel('gemini-1.5-flash-latest')
+            # 2026 GÜNCEL MODEL İSMİ: gemini-2.5-flash
+            model = genai.GenerativeModel('gemini-2.5-flash')
             
             prompt = f"""
             Sen profesyonel bir futbol analiz uygulamasısın. {league} ligindeki {match} maçı için teknik analiz yap.
@@ -41,12 +41,12 @@ if analyze_btn and match:
             Lütfen tam olarak şu yapıda cevap ver:
             
             ### 📊 Olasılık Hesaplamaları
-            - **MS 1-X-2:** (Yüzdeleri belirt)
-            - **2.5 Alt/Üst:** (Yüzde belirt)
-            - **KG Var/Yok:** (Yüzde belirt)
+            - MS 1-X-2: (Yüzdeleri belirt)
+            - 2.5 Alt/Üst: (Yüzde belirt)
+            - KG Var/Yok: (Yüzde belirt)
             
             ### 🚑 Oyuncu Bazlı Etki & Sakatlıklar
-            (Maçtaki kritik eksikleri ve bunların takımın kazanma ihtimalini nasıl etkilediğini teknik olarak açıkla.)
+            (Maçtaki kritik eksikleri ve bunların takımların gücünü nasıl etkilediğini açıkla.)
             
             ### ⚠️ Risk Uyarısı
             (Maçın en sürpriz açık yanını veya bahis riskini belirt.)
@@ -63,6 +63,7 @@ if analyze_btn and match:
             
         except Exception as e:
             st.error(f"Bir hata oluştu: {e}")
+            st.info("İpucu: Eğer model ismi hatası devam ederse, API anahtarının Google AI Studio'da aktif olduğundan emin ol.")
 else:
     st.info("Yukarıdaki kutucuğa bir maç ismi yazıp butona basarak analizi görebilirsin.")
 
