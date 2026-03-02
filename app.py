@@ -2,65 +2,55 @@ import streamlit as st
 import google.generativeai as genai
 from datetime import datetime
 
-# --- YAPILANDIRMA ---
-# ÖNEMLİ: Eğer anahtarın hala hata veriyorsa AI Studio'dan "v1" anahtarı aldığından emin ol.
+# --- 1. YAPILANDIRMA ---
+# Buraya Google AI Studio'dan aldığın YENİ anahtarı koymayı unutma Kağan.
 API_KEY = "AIzaSyCOAkFPIQq4v4Scz4I0WyO21CisGlxM2Zg" 
 genai.configure(api_key=API_KEY)
 
 # Sayfa Ayarları
 st.set_page_config(page_title="Kağan'ın AI Analiz", page_icon="⚽", layout="centered")
 
-# Tarihi sistemden otomatik alıyoruz
+# Tarihi her gün otomatik günceller
 sistem_tarihi = datetime.now().strftime("%d %B %Y")
 
 # Tasarım (CSS)
 st.markdown("""
     <style>
-    .main { background-color: #0e1117; }
-    .stButton>button { width: 100%; border-radius: 20px; background-color: #2e7d32; color: white; font-weight: bold; height: 50px; }
-    .result-box { padding: 20px; border-radius: 15px; background-color: #1e1e1e; border: 1px solid #4caf50; color: white; white-space: pre-wrap; font-family: sans-serif; }
+    .stButton>button { width: 100%; border-radius: 20px; background-color: #2e7d32; color: white; font-weight: bold; }
+    .result-box { padding: 20px; border-radius: 15px; background-color: #1e1e1e; border: 1px solid #4caf50; color: white; white-space: pre-wrap; }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("⚽ Kağan'ın AI Futbol Analiz Merkezi")
-st.info(f"📅 Sistem Tarihi: {sistem_tarihi}")
+st.info(f"📅 Bugün: {sistem_tarihi}")
 
-# --- GİRDİ PANELİ ---
-with st.container():
-    league = st.selectbox("Lig Seçin", ["Premier Lig", "La Liga", "Trendyol Süper Lig", "Şampiyonlar Ligi", "Bundesliga"])
-    match = st.text_input("Maç İsmi Yazın (Örn: Brighton - Manchester City)", "")
-    analyze_btn = st.button("Analizi Başlat 🚀")
+# --- 2. GİRDİ PANELİ ---
+league = st.selectbox("Lig Seçin", ["Premier Lig", "La Liga", "Trendyol Süper Lig", "Bundesliga"])
+match = st.text_input("Maç İsmi Yazın (Örn: Brighton - Liverpool)", "")
+analyze_btn = st.button("Analizi Başlat ve 2026 Verilerini Tara 🚀")
 
 st.markdown("---")
 
-# --- ANALİZ MOTORU ---
+# --- 3. ANALİZ MOTORU ---
 if analyze_btn and match:
-    with st.spinner(f'{match} için veriler taranıyor...'):
+    with st.spinner('AI İnternette güncel kadroları ve hocaları tarıyor...'):
         try:
-            # --- KRİTİK DÜZELTME BÖLGESİ ---
-            # 404 hatasını aşmak için model ismini doğrudan 'gemini-1.5-flash' (slash olmadan) 
-            # veya 'models/gemini-1.5-flash-latest' olarak denemeliyiz.
-            # En güncel SDK'lar için 'gemini-1.5-flash' yeterlidir.
-            
+            # En güncel ve hata vermeyen model tanımı
             model = genai.GenerativeModel(
-                model_name='gemini-1.5-flash', # Başına models/ koymadan dene
+                model_name='models/gemini-1.5-flash',
                 tools=[{"google_search_retrieval": {}}]
             )
             
             prompt = f"""
-            Sen profesyonel bir futbol analistisin. Bugünün gerçek tarihi: {sistem_tarihi}.
-            {league} ligindeki {match} maçı için internetten en güncel (2026) verileri tara. 
+            Bugünün tarihi {sistem_tarihi}. {league} ligindeki {match} maçı için internetten en güncel haberleri tara. 
+            Eski verileri (De Zerbi gibi) kesinlikle kullanma. Brighton hocasının Hürzeler olduğunu unutma.
             
-            Özellikle:
-            - Teknik direktörlerin ve sakat oyuncuların GÜNCEL olduğundan emin ol.
-            - Brighton başında Fabian Hürzeler, Liverpool başında Arne Slot gibi 2026 güncel bilgilerini kullan.
-            
+            Lütfen şu yapıda yanıt ver:
             ### 📊 Olasılık Hesaplamaları
             - MS 1-X-2: (Yüzde Tahminleri)
-            - 2.5 Alt/Üst: (Tahmin)
             
-            ### 🚑 Güncel Kadro & Teknik Detaylar
-            (Eksik oyuncu analizi ve güncel hoca bilgisi.)
+            ### 🚑 Güncel Kadro & Sakatlıklar
+            (Takımların GÜNCEL hocasını ve eksiklerini belirt.)
             
             ### 🎯 Kağan'ın Net Tahmini
             (Kısa ve net sonuç önerisi.)
@@ -72,10 +62,9 @@ if analyze_btn and match:
             st.markdown(f'<div class="result-box">{response.text}</div>', unsafe_allow_html=True)
             
         except Exception as e:
-            # Eğer hala hata verirse, otomatik olarak alternatif isimlendirmeyi denetelim:
-            st.error(f"Sistem hatası: {e}")
-            st.warning("İpucu: Terminale 'pip install --upgrade google-generativeai' yazarak kütüphaneyi güncellemeyi dene.")
+            # Hata devam ederse burası çalışır
+            st.error(f"Hala hata alıyoruz Kağan. Hata mesajı: {e}")
 else:
-    st.info("Maç ismini girip butona basarak analizi görebilirsin.")
+    st.info("Maç ismini girip butona basman yeterli.")
 
 st.caption(f"Kağan'ın Özel AI Sistemi - {sistem_tarihi}")
